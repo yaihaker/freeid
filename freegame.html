@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมวงล้อ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #wheel {
+            width: 300px;
+            height: 300px;
+            border: 16px solid #4CAF50;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            transform: rotate(0deg);
+            transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1);
+        }
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            background-color: #4CAF50;
+            transform-origin: 100% 100%;
+            clip-path: polygon(100% 0, 0 100%, 100% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        #spinButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>เกมวงล้อ</h1>
+    <div id="wheel"></div>
+    <button id="spinButton">หมุนวงล้อ</button>
+    <p id="result"></p>
+
+    <script>
+        const values = [100, 2000, 3000, 5000, 4000, 60000];
+        const percentages = [10, 20, 20, 20, 20, 10]; // เปอร์เซ็นต์สำหรับแต่ละหมายเลข
+        const wheel = document.getElementById('wheel');
+        const resultDisplay = document.getElementById('result');
+        const spinButton = document.getElementById('spinButton');
+
+        // สร้างวงล้อ
+        function createWheel() {
+            let totalPercentage = 0;
+
+            // สร้าง segment ตามเปอร์เซ็นต์
+            for (let i = 0; i < values.length; i++) {
+                const segment = document.createElement('div');
+                segment.classList.add('segment');
+
+                const angle = (percentages[i] / 100) * 360; // คำนวณมุมจากเปอร์เซ็นต์
+                segment.style.backgroundColor = `hsl(${(i * 360) / values.length}, 70%, 50%)`;
+                segment.style.transform = `rotate(${totalPercentage}deg)`;
+                
+                // แสดงตัวเลขใน segment
+                segment.innerText = values[i];
+                
+                wheel.appendChild(segment);
+
+                totalPercentage += angle; // อัปเดตมุมรวม
+            }
+        }
+
+        // หมุนวงล้อ
+        function spinWheel() {
+            const randomDegree = Math.floor(Math.random() * 360 + 3600); // หมุนสุ่มอย่างน้อย 10 รอบ
+            wheel.style.transform = `rotate(${randomDegree}deg)`;
+            setTimeout(() => {
+                const winningAngle = randomDegree % 360; // มุมสุดท้ายที่หมุน
+                const segmentAngle = 360 / values.length; // มุมต่อ segment
+
+                // หาค่าที่ชนะจากมุมที่หมุน
+                const winningSegmentIndex = Math.floor((winningAngle / segmentAngle) % values.length);
+                const winningValue = values[winningSegmentIndex];
+                resultDisplay.innerText = `คุณชนะ: ${winningValue}`;
+            }, 4000); // แสดงผลหลังจากการหมุนเสร็จ
+        }
+
+        spinButton.addEventListener('click', spinWheel);
+        createWheel();
+    </script>
+</body>
+</html>
